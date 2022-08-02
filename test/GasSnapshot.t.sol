@@ -17,7 +17,7 @@ contract GasSnapshotTest is Test {
         getSnapshot[0] = "cat";
         getSnapshot[1] = ".forge-snapshots/small.snap";
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "22211");
+        assertEq(string(res), "178");
     }
 
     function testMedium() public {
@@ -26,7 +26,7 @@ contract GasSnapshotTest is Test {
         getSnapshot[0] = "cat";
         getSnapshot[1] = ".forge-snapshots/medium.snap";
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "40769");
+        assertEq(string(res), "18736");
     }
 
     function testLarge() public {
@@ -35,6 +35,6 @@ contract GasSnapshotTest is Test {
         getSnapshot[0] = "cat";
         getSnapshot[1] = ".forge-snapshots/large.snap";
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "72566");
+        assertEq(string(res), "50533");
     }
 }
