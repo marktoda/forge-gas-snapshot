@@ -11,6 +11,8 @@ Benefits over `forge test --gas-report`:
 forge install marktoda/forge-gas-snapshot
 ```
 
+- `ffi` must be enabled
+
 # Usage
 
 ```solidity
