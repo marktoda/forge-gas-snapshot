@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.15;
 
-import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract GasSnapshot is Script {
@@ -9,6 +8,10 @@ contract GasSnapshot is Script {
 
     uint256 internal cachedGas;
     string internal cachedName;
+
+    constructor() {
+        _mkdirp(SNAP_DIR);
+    }
 
     function snapStart(string memory name) internal {
         cachedName = name;
@@ -18,14 +21,26 @@ contract GasSnapshot is Script {
     function snapEnd() internal {
         uint256 newGasLeft = gasleft();
         uint256 gasUsed = cachedGas - newGasLeft;
-        string[] memory writeSnapshot = new string[](4);
-        writeSnapshot[0] = "./write-snapshot.sh";
-        writeSnapshot[1] =
-            string(abi.encodePacked(SNAP_DIR, cachedName, ".snap"));
-        writeSnapshot[2] = vm.toString(gasUsed);
-        vm.ffi(writeSnapshot);
-
         // reset to 0 so all writes are cold for consistent overhead handling
         cachedGas = 0;
+
+        _writeSnapshot(cachedName, gasUsed);
+    }
+
+    function _writeSnapshot(string memory name, uint256 gasUsed) private {
+        string[] memory writeSnapshot = new string[](3);
+        string memory fileName = string(abi.encodePacked(SNAP_DIR, name, ".snap"));
+        writeSnapshot[0] = "sh";
+        writeSnapshot[1] = "-c";
+        writeSnapshot[2] = string(abi.encodePacked("echo -n ", vm.toString(gasUsed), " > ", fileName));
+        vm.ffi(writeSnapshot);
+    }
+
+    function _mkdirp(string memory dir) private {
+        string[] memory mkdirp = new string[](3);
+        mkdirp[0] = "mkdir";
+        mkdirp[1] = "-p";
+        mkdirp[2] = dir;
+        vm.ffi(mkdirp);
     }
 }
