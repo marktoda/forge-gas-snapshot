@@ -15,6 +15,8 @@ forge install marktoda/forge-gas-snapshot
 
 # Usage
 
+By default, gas snapshots are automatically written to `./forge-snapshots/<test-name>.snap` on run: 
+
 ```solidity
 import {GasSnapshot} from "marktoda/forge-gas-snapshot";
 
@@ -27,7 +29,8 @@ contract MyTest is GasSnapshot {
 }
 ```
 
-Gas snapshots are saved to `<root>/.forge-snapshots/<test-name>.snap`
+### Check Mode
+Snapshots can be run in check-mode where they revert on mismatch by setting an environment variable `FORGE_SNAPSHOT_CHECK=true`
 
 
 # TODO Improvements
