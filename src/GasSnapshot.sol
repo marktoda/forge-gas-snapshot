@@ -45,14 +45,14 @@ contract GasSnapshot is Script {
         cachedGas = 0;
 
         if (check) {
-            _checkSnapshot(gasUsed, cachedName);
+            _checkSnapshot(cachedName, gasUsed);
         } else {
             _writeSnapshot(cachedName, gasUsed);
         }
     }
 
     /// @notice Check the gas usage against the snapshot. Revert on mismatch
-    function _checkSnapshot(uint256 gasUsed, string memory name) internal {
+    function _checkSnapshot(string memory name, uint256 gasUsed) internal {
         uint256 oldGasUsed = _readSnapshot(name);
         if (oldGasUsed != gasUsed) {
             revert GasMismatch(oldGasUsed, gasUsed);
@@ -61,10 +61,7 @@ contract GasSnapshot is Script {
 
     /// @notice Read the last snapshot value from the file
     function _readSnapshot(string memory name) private returns (uint256 res) {
-        string[] memory getSnapshot = new string[](2);
-        getSnapshot[0] = "cat";
-        getSnapshot[1] = _getSnapFile(name);
-        string memory oldValue = string(vm.ffi(getSnapshot));
+        string memory oldValue = vm.readLine(_getSnapFile(name));
         // hack to use forge string uint parsing
         vm.setEnv(TEMP_ENV_VAR, oldValue);
         res = vm.envUint(TEMP_ENV_VAR);
@@ -72,13 +69,7 @@ contract GasSnapshot is Script {
 
     /// @notice Write the new snapshot value to file
     function _writeSnapshot(string memory name, uint256 gasUsed) private {
-        string[] memory writeSnapshot = new string[](3);
-        writeSnapshot[0] = "sh";
-        writeSnapshot[1] = "-c";
-        writeSnapshot[2] = string(
-            abi.encodePacked("echo -n ", vm.toString(gasUsed), " > ", _getSnapFile(name))
-        );
-        vm.ffi(writeSnapshot);
+        vm.writeFile(_getSnapFile(name), vm.toString(gasUsed));
     }
 
     /// @notice Make the directory for snapshots
