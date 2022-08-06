@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.15;
 
+import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract GasSnapshot is Script {
@@ -12,8 +13,10 @@ contract GasSnapshot is Script {
     string public constant SNAP_DIR = ".forge-snapshots/";
     /// @notice temporary env variable to help with string parsing
     string private constant TEMP_ENV_VAR = "_forge_snapshot_temp_gas";
+    /// @notice gas overhead for the snapshotting function itself
+    uint256 private constant GAS_CALIBRATION = 22100;
     /// @notice if true, revert on gas mismatch, else overwrite with new values
-    bool internal check;
+    bool private check;
 
     /// @notice Transient variable for the start gas
     uint256 internal cachedGas;
@@ -33,14 +36,15 @@ contract GasSnapshot is Script {
     /// @dev The next call to `snapEnd` will end the snapshot
     function snapStart(string memory name) internal {
         cachedName = name;
-        cachedGas = gasleft() - 22100; // subtract sstore cost
+        cachedGas = gasleft();
     }
 
     /// @notice End the current snapshot
     /// @dev Must be called after a call to `snapStart`, else reverts with underflow
     function snapEnd() internal {
         uint256 newGasLeft = gasleft();
-        uint256 gasUsed = cachedGas - newGasLeft;
+        // subtract original gas and snapshot gas overhead
+        uint256 gasUsed = cachedGas - newGasLeft - GAS_CALIBRATION;
         // reset to 0 so all writes are cold for consistent overhead handling
         cachedGas = 0;
 

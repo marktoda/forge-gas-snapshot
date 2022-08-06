@@ -22,7 +22,7 @@ contract GasSnapshotTest is Test {
         getSnapshot[1] = ".forge-snapshots/add.snap";
 
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "201");
+        assertEq(string(res), "134");
     }
 
     function testManyAdd() public {
@@ -32,7 +32,7 @@ contract GasSnapshotTest is Test {
         getSnapshot[0] = "cat";
         getSnapshot[1] = ".forge-snapshots/manyAdd.snap";
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "18762");
+        assertEq(string(res), "18695");
     }
 
     function testManySstore() public {
@@ -42,7 +42,7 @@ contract GasSnapshotTest is Test {
         getSnapshot[0] = "cat";
         getSnapshot[1] = ".forge-snapshots/manySstore.snap";
         bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "50557");
+        assertEq(string(res), "50490");
     }
 
     function testCheckManyAdd() public {
@@ -57,7 +57,7 @@ contract GasSnapshotTest is Test {
         SimpleOperationsGas otherGasTests = new SimpleOperationsGas("snap");
         // preloaded with the wrong value
         vm.expectRevert(
-            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 50557)
+            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 50490)
         );
         otherGasTests.testManySstoreGas();
     }
