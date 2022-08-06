@@ -2,8 +2,10 @@
 
 Flexible, checked-in gas snapshotting for [Foundry](https://github.com/foundry-rs).
 
-Benefits over `forge test --gas-report`:
-- See gas diff in version control on PR
+Forge has native gas reporting with `forge snapshot` and `forge test --gas-report`, but neither perfectly fit my needs. Specifically, `forge-gas-snapshot` aims to allow for:
+- Gas reports over specific, known flows 
+    - not entire tests and not an average of all calls
+- Check gas diffs into version control
 - See gas changes over time through commit history
 
 # Installation
@@ -11,14 +13,14 @@ Benefits over `forge test --gas-report`:
 forge install marktoda/forge-gas-snapshot
 ```
 
-- `ffi` must be enabled
+- NOTE: `ffi` must be enabled
 
 # Usage
 
 By default, gas snapshots are automatically written to `./forge-snapshots/<test-name>.snap` on run: 
 
 ```solidity
-import {GasSnapshot} from "marktoda/forge-gas-snapshot";
+import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 
 contract MyTest is GasSnapshot {
     function test() public {
