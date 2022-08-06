@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
+import {UintString} from "./utils/UintString.sol";
 
 contract GasSnapshot is Script {
     error GasMismatch(uint256 oldGas, uint256 newGas);
@@ -15,13 +15,13 @@ contract GasSnapshot is Script {
     string private constant TEMP_ENV_VAR = "_forge_snapshot_temp_gas";
     /// @notice gas overhead for the snapshotting function itself
     uint256 private constant GAS_CALIBRATION = 22100;
+
     /// @notice if true, revert on gas mismatch, else overwrite with new values
     bool private check;
-
     /// @notice Transient variable for the start gas
-    uint256 internal cachedGas;
+    uint256 private cachedGas;
     /// @notice Transient variable for the snapshot name
-    string internal cachedName;
+    string private cachedName;
 
     constructor() {
         _mkdirp(SNAP_DIR);
@@ -66,9 +66,7 @@ contract GasSnapshot is Script {
     /// @notice Read the last snapshot value from the file
     function _readSnapshot(string memory name) private returns (uint256 res) {
         string memory oldValue = vm.readLine(_getSnapFile(name));
-        // hack to use forge string uint parsing
-        vm.setEnv(TEMP_ENV_VAR, oldValue);
-        res = vm.envUint(TEMP_ENV_VAR);
+        res = UintString.stringToUint(oldValue);
     }
 
     /// @notice Write the new snapshot value to file
