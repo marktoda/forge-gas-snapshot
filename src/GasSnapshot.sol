@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.15;
 
-import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract GasSnapshot is Script {
