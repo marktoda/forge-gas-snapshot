@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import "forge-std/console2.sol";
 import {Test} from "forge-std/Test.sol";
 import {GasSnapshot} from "../src/GasSnapshot.sol";
 import {SimpleOperations} from "../src/test/SimpleOperations.sol";
@@ -17,32 +18,32 @@ contract GasSnapshotTest is Test {
     function testAdd() public {
         simpleOperationsGas.testAddGas();
 
-        string[] memory getSnapshot = new string[](2);
-        getSnapshot[0] = "cat";
-        getSnapshot[1] = ".forge-snapshots/add.snap";
+        string memory value = vm.readLine(".forge-snapshots/add.snap");
+        assertEq(value, "134");
+    }
 
-        bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "134");
+    function testAddTwice() public {
+        simpleOperationsGas.testAddGasTwice();
+
+        string memory first = vm.readLine(".forge-snapshots/addFirst.snap");
+        string memory second = vm.readLine(".forge-snapshots/addSecond.snap");
+
+        assertEq(first, second);
+        assertEq(first, "134");
     }
 
     function testManyAdd() public {
         simpleOperationsGas.testManyAddGas();
 
-        string[] memory getSnapshot = new string[](2);
-        getSnapshot[0] = "cat";
-        getSnapshot[1] = ".forge-snapshots/manyAdd.snap";
-        bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "18695");
+        string memory value = vm.readLine(".forge-snapshots/manyAdd.snap");
+        assertEq(value, "19195");
     }
 
     function testManySstore() public {
         simpleOperationsGas.testManySstoreGas();
 
-        string[] memory getSnapshot = new string[](2);
-        getSnapshot[0] = "cat";
-        getSnapshot[1] = ".forge-snapshots/manySstore.snap";
-        bytes memory res = vm.ffi(getSnapshot);
-        assertEq(string(res), "50490");
+        string memory value = vm.readLine(".forge-snapshots/manySstore.snap");
+        assertEq(value, "50990");
     }
 
     function testCheckManyAdd() public {
@@ -57,7 +58,7 @@ contract GasSnapshotTest is Test {
         SimpleOperationsGas otherGasTests = new SimpleOperationsGas("snap");
         // preloaded with the wrong value
         vm.expectRevert(
-            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 50490)
+            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 50990)
         );
         otherGasTests.testManySstoreGas();
     }

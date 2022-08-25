@@ -17,6 +17,16 @@ contract SimpleOperationsGas is SimpleOperations, GasSnapshot {
         snapEnd();
     }
 
+    function testAddGasTwice() external {
+        snapStart(string(abi.encodePacked(prefix, "addFirst")));
+        add();
+        snapEnd();
+
+        snapStart(string(abi.encodePacked(prefix, "addSecond")));
+        add();
+        snapEnd();
+    }
+
     function testManyAddGas() external {
         snapStart(string(abi.encodePacked(prefix, "manyAdd")));
         manyAdd();

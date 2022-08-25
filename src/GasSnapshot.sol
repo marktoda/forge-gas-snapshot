@@ -14,7 +14,7 @@ contract GasSnapshot is Script {
     /// @notice temporary env variable to help with string parsing
     string private constant TEMP_ENV_VAR = "_forge_snapshot_temp_gas";
     /// @notice gas overhead for the snapshotting function itself
-    uint256 private constant GAS_CALIBRATION = 22100;
+    uint256 private constant GAS_CALIBRATION = 100;
 
     /// @notice if true, revert on gas mismatch, else overwrite with new values
     bool private check;
@@ -35,6 +35,8 @@ contract GasSnapshot is Script {
     /// @notice Start a snapshot with the given name
     /// @dev The next call to `snapEnd` will end the snapshot
     function snapStart(string memory name) internal {
+        // warm up cachedGas so the only sstore after calling `gasleft` is exactly 100 gas
+        cachedGas = 2;
         cachedName = name;
         cachedGas = gasleft();
     }
@@ -45,8 +47,8 @@ contract GasSnapshot is Script {
         uint256 newGasLeft = gasleft();
         // subtract original gas and snapshot gas overhead
         uint256 gasUsed = cachedGas - newGasLeft - GAS_CALIBRATION;
-        // reset to 0 so all writes are cold for consistent overhead handling
-        cachedGas = 0;
+        // reset to 1 so all writes are warm for consistent overhead handling
+        cachedGas = 1;
 
         if (check) {
             _checkSnapshot(cachedName, gasUsed);
