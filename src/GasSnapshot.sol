@@ -36,7 +36,7 @@ contract GasSnapshot is Script {
     /// @dev The next call to `snapEnd` will end the snapshot
     function snapStart(string memory name) internal {
         // warm up cachedGas so the only sstore after calling `gasleft` is exactly 100 gas
-        cachedGas = 2;
+        cachedGas = 1;
         cachedName = name;
         cachedGas = gasleft();
     }
@@ -47,8 +47,8 @@ contract GasSnapshot is Script {
         uint256 newGasLeft = gasleft();
         // subtract original gas and snapshot gas overhead
         uint256 gasUsed = cachedGas - newGasLeft - GAS_CALIBRATION;
-        // reset to 1 so all writes are warm for consistent overhead handling
-        cachedGas = 1;
+        // reset to 0 so all writes for consistent overhead handling
+        cachedGas = 0;
 
         if (check) {
             _checkSnapshot(cachedName, gasUsed);
