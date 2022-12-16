@@ -5,61 +5,97 @@ import "forge-std/console2.sol";
 import {Test} from "forge-std/Test.sol";
 import {GasSnapshot} from "../src/GasSnapshot.sol";
 import {SimpleOperations} from "../src/test/SimpleOperations.sol";
-import {SimpleOperationsGas} from "../src/test/SimpleOperationsGas.sol";
 
-contract GasSnapshotTest is Test {
+contract GasSnapshotTest is Test, GasSnapshot {
     SimpleOperations simpleOperations;
-    SimpleOperationsGas simpleOperationsGas;
 
     function setUp() public {
-        simpleOperationsGas = new SimpleOperationsGas("");
+        simpleOperations = new SimpleOperations();
     }
 
     function testAdd() public {
-        simpleOperationsGas.testAddGas();
+        snapStart("add");
+        simpleOperations.add();
+        snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/add.snap");
-        assertEq(value, "134");
+        assertEq(value, "5247");
     }
 
     function testAddTwice() public {
-        simpleOperationsGas.testAddGasTwice();
+        snapStart("addFirst");
+        simpleOperations.add();
+        snapEnd();
+
+        snapStart("addSecond");
+        simpleOperations.add();
+        snapEnd();
+
+        snapStart("addThird");
+        simpleOperations.add();
+        snapEnd();
 
         string memory first = vm.readLine(".forge-snapshots/addFirst.snap");
         string memory second = vm.readLine(".forge-snapshots/addSecond.snap");
+        string memory third = vm.readLine(".forge-snapshots/addThird.snap");
 
-        assertEq(first, second);
-        assertEq(first, "134");
+        assertEq(second, third);
+        assertEq(first, "5247");
+        assertEq(second, "744");
     }
 
     function testManyAdd() public {
-        simpleOperationsGas.testManyAddGas();
+        snapStart("manyAdd");
+        simpleOperations.manyAdd();
+        snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/manyAdd.snap");
-        assertEq(value, "19195");
+        assertEq(value, "24330");
     }
 
     function testManySstore() public {
-        simpleOperationsGas.testManySstoreGas();
+        snapStart("manySstore");
+        simpleOperations.manySstore();
+        snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/manySstore.snap");
-        assertEq(value, "50990");
+        assertEq(value, "56084");
+    }
+
+    function testSnapshotCodeSize() public {
+        SimpleOperations sizeTarget = new SimpleOperations();
+        snapSize(address(sizeTarget), "sizeTarget");
+        string memory size = vm.readLine(".forge-snapshots/sizeTarget.snap");
+        assertEq(size, "303");
+    }
+
+    function testSnapshotCheckSize() public {
+        setCheckMode(true);
+        SimpleOperations sizeTarget = new SimpleOperations();
+        snapSize(address(sizeTarget), "checkSize");
+    }
+
+    function testSnapshotCheckSizeFail() public {
+        setCheckMode(true);
+        SimpleOperations sizeTarget = new SimpleOperations();
+        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 303));
+        snapSize(address(sizeTarget), "checkSizeFail");
     }
 
     function testCheckManyAdd() public {
-        vm.setEnv("FORGE_SNAPSHOT_CHECK", "true");
-        SimpleOperationsGas otherGasTests = new SimpleOperationsGas("snap");
+        setCheckMode(true);
         // preloaded with the right value
-        otherGasTests.testManyAddGas();
+        snapStart("checkManyAdd");
+        simpleOperations.manyAdd();
+        snapEnd();
     }
 
     function testCheckManySstoreFails() public {
-        vm.setEnv("FORGE_SNAPSHOT_CHECK", "true");
-        SimpleOperationsGas otherGasTests = new SimpleOperationsGas("snap");
+        setCheckMode(true);
         // preloaded with the wrong value
-        vm.expectRevert(
-            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 50990)
-        );
-        otherGasTests.testManySstoreGas();
+        snapStart("checkManySstore");
+        simpleOperations.manySstore();
+        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 59561));
+        snapEnd();
     }
 }
