@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
 import {UintString} from "./utils/UintString.sol";
 
@@ -17,7 +18,7 @@ contract GasSnapshot is Script {
     uint256 private constant GAS_CALIBRATION = 100;
 
     /// @notice if true, revert on gas mismatch, else overwrite with new values
-    bool private check;
+    bool internal check;
     /// @notice Transient variable for the start gas
     uint256 private cachedGas;
     /// @notice Transient variable for the snapshot name
@@ -29,6 +30,18 @@ contract GasSnapshot is Script {
             check = _check;
         } catch {
             check = false;
+        }
+    }
+
+    /// @notice Write a size snapshot with the given name
+    /// @param target the contract to snapshot the size of
+    /// @dev The next call to `snapEnd` will end the snapshot
+    function snapSize(address target, string memory name) internal {
+        uint256 size = target.code.length;
+        if (check) {
+            _checkSnapshot(name, size);
+        } else {
+            _writeSnapshot(name, size);
         }
     }
 
@@ -86,11 +99,12 @@ contract GasSnapshot is Script {
     }
 
     /// @notice Get the snapshot file name
-    function _getSnapFile(string memory name)
-        private
-        pure
-        returns (string memory)
-    {
+    function _getSnapFile(string memory name) private pure returns (string memory) {
         return string(abi.encodePacked(SNAP_DIR, name, ".snap"));
+    }
+
+    /// @notice sets the library to check mode
+    function setCheckMode(bool _check) internal {
+        check = _check;
     }
 }

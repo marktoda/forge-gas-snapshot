@@ -5,11 +5,7 @@ library UintString {
     error InvalidStringNumber(string s);
 
     /// @notice converts the given string s into a uint256
-    function stringToUint(string memory s)
-        internal
-        pure
-        returns (uint256 result)
-    {
+    function stringToUint(string memory s) internal pure returns (uint256 result) {
         bytes memory b = bytes(s);
         uint256 oldResult = 0;
         for (uint256 i = 0; i < b.length; i++) {
