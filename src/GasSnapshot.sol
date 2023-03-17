@@ -45,6 +45,15 @@ contract GasSnapshot is Script {
         }
     }
 
+    /// @notice Snapshot the given value
+    function snap(string memory name, uint256 value) internal {
+        if (check) {
+            _checkSnapshot(name, value);
+        } else {
+            _writeSnapshot(name, value);
+        }
+    }
+
     /// @notice Snapshot the given external closure
     /// @dev most accurate as storage cost semantics are not involved
     function snap(string memory name, function() external fn) internal {

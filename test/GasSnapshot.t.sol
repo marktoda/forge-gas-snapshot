@@ -13,6 +13,13 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations = new SimpleOperations();
     }
 
+    function testSnapValue() public {
+        snap("value", 1234);
+
+        string memory value = vm.readLine(".forge-snapshots/value.snap");
+        assertEq(value, "1234");
+    }
+
     function testAdd() public {
         snapStart("add");
         simpleOperations.add();
