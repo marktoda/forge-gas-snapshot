@@ -22,6 +22,27 @@ contract GasSnapshotTest is Test, GasSnapshot {
         assertEq(value, "5247");
     }
 
+    function testAddClosure() public {
+        snap("addClosure", simpleOperations.add);
+
+        string memory value = vm.readLine(".forge-snapshots/addClosure.snap");
+        assertEq(value, "3060");
+    }
+
+    function testSstoreClosure() public {
+        snap("sstoreClosure", simpleOperations.manySstore);
+
+        string memory value = vm.readLine(".forge-snapshots/sstoreClosure.snap");
+        assertEq(value, "53894");
+    }
+
+    function testInternalClosure() public {
+        snap("internalClosure", add);
+
+        string memory value = vm.readLine(".forge-snapshots/internalClosure.snap");
+        assertEq(value, "19177");
+    }
+
     function testAddTwice() public {
         snapStart("addFirst");
         simpleOperations.add();
@@ -97,5 +118,12 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.manySstore();
         vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 59561));
         snapEnd();
+    }
+
+    function add() internal pure {
+        uint256 x = 0;
+        for (uint256 i = 0; i < 100; i++) {
+            x += i;
+        }
     }
 }

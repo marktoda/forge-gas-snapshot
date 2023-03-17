@@ -45,6 +45,32 @@ contract GasSnapshot is Script {
         }
     }
 
+    /// @notice Snapshot the given external closure
+    /// @dev most accurate as storage cost semantics are not involved
+    function snap(string memory name, function() external fn) internal {
+        uint256 gasBefore = gasleft();
+        fn();
+        uint256 gasUsed = gasBefore - gasleft();
+        if (check) {
+            _checkSnapshot(name, gasUsed);
+        } else {
+            _writeSnapshot(name, gasUsed);
+        }
+    }
+
+    /// @notice Snapshot the given internal closure
+    /// @dev most accurate as storage cost semantics are not involved
+    function snap(string memory name, function() internal fn) internal {
+        uint256 gasBefore = gasleft();
+        fn();
+        uint256 gasUsed = gasBefore - gasleft();
+        if (check) {
+            _checkSnapshot(name, gasUsed);
+        } else {
+            _writeSnapshot(name, gasUsed);
+        }
+    }
+
     /// @notice Start a snapshot with the given name
     /// @dev The next call to `snapEnd` will end the snapshot
     function snapStart(string memory name) internal {
