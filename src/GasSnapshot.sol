@@ -106,7 +106,7 @@ contract GasSnapshot is Script {
     }
 
     /// @notice Check the gas usage against the snapshot. Revert on mismatch
-    function _checkSnapshot(string memory name, uint256 gasUsed) internal {
+    function _checkSnapshot(string memory name, uint256 gasUsed) internal view {
         uint256 oldGasUsed = _readSnapshot(name);
         if (oldGasUsed != gasUsed) {
             revert GasMismatch(oldGasUsed, gasUsed);
@@ -114,7 +114,7 @@ contract GasSnapshot is Script {
     }
 
     /// @notice Read the last snapshot value from the file
-    function _readSnapshot(string memory name) private returns (uint256 res) {
+    function _readSnapshot(string memory name) private view returns (uint256 res) {
         string memory oldValue = vm.readLine(_getSnapFile(name));
         res = UintString.stringToUint(oldValue);
     }
