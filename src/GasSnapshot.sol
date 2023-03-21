@@ -36,7 +36,7 @@ contract GasSnapshot is Script {
     /// @notice Write a size snapshot with the given name
     /// @param target the contract to snapshot the size of
     /// @dev The next call to `snapEnd` will end the snapshot
-    function snapSize(address target, string memory name) internal {
+    function snapSize(string memory name, address target) internal {
         uint256 size = target.code.length;
         if (check) {
             _checkSnapshot(name, size);

@@ -92,7 +92,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
 
     function testSnapshotCodeSize() public {
         SimpleOperations sizeTarget = new SimpleOperations();
-        snapSize(address(sizeTarget), "sizeTarget");
+        snapSize("sizeTarget", address(sizeTarget));
         string memory size = vm.readLine(".forge-snapshots/sizeTarget.snap");
         assertEq(size, "303");
     }
@@ -100,14 +100,14 @@ contract GasSnapshotTest is Test, GasSnapshot {
     function testSnapshotCheckSize() public {
         setCheckMode(true);
         SimpleOperations sizeTarget = new SimpleOperations();
-        snapSize(address(sizeTarget), "checkSize");
+        snapSize("checkSize", address(sizeTarget));
     }
 
     function testSnapshotCheckSizeFail() public {
         setCheckMode(true);
         SimpleOperations sizeTarget = new SimpleOperations();
         vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 303));
-        snapSize(address(sizeTarget), "checkSizeFail");
+        snapSize("checkSizeFail", address(sizeTarget));
     }
 
     function testCheckManyAdd() public {
