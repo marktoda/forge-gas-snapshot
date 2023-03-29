@@ -13,7 +13,13 @@ Forge has native gas reporting with `forge snapshot` and `forge test --gas-repor
 forge install marktoda/forge-gas-snapshot
 ```
 
-- NOTE: `ffi` must be enabled
+- NOTE: foundry.toml must be updated to allow forge to write the snapshots
+```toml
+[profile.default]
+...
+ffi = true
+fs_permissions = [{ access = "read-write", path = ".forge-snapshots/"}]
+```
 
 # Usage
 
