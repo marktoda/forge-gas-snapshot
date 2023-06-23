@@ -5,9 +5,18 @@ import "forge-std/console2.sol";
 import {Test} from "forge-std/Test.sol";
 import {GasSnapshot} from "../src/GasSnapshot.sol";
 import {SimpleOperations} from "../src/test/SimpleOperations.sol";
+import {TextHandler} from "../src/utils/TextHandler.sol";
 
 contract GasSnapshotTest is Test, GasSnapshot {
     SimpleOperations simpleOperations;
+
+    /// @notice Returns the first line of the specified file.
+    /// @param path The filepath
+    /// @return line The first line
+    function readFirstLine(string memory path) public view returns (string memory line) {
+        string memory data = vm.readFile(path);
+        line = TextHandler.extractFirstLine(data);
+    }
 
     function setUp() public {
         simpleOperations = new SimpleOperations();
@@ -16,7 +25,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
     function testSnapValue() public {
         snap("value", 1234);
 
-        string memory value = vm.readLine(".forge-snapshots/value.snap");
+        string memory value = readFirstLine(".forge-snapshots/value.snap");
         assertEq(value, "1234");
     }
 
@@ -25,28 +34,28 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.add();
         snapEnd();
 
-        string memory value = vm.readLine(".forge-snapshots/add.snap");
+        string memory value = readFirstLine(".forge-snapshots/add.snap");
         assertEq(value, "5247");
     }
 
     function testAddClosure() public {
         snap("addClosure", simpleOperations.add);
 
-        string memory value = vm.readLine(".forge-snapshots/addClosure.snap");
+        string memory value = readFirstLine(".forge-snapshots/addClosure.snap");
         assertEq(value, "3060");
     }
 
     function testSstoreClosure() public {
         snap("sstoreClosure", simpleOperations.manySstore);
 
-        string memory value = vm.readLine(".forge-snapshots/sstoreClosure.snap");
+        string memory value = readFirstLine(".forge-snapshots/sstoreClosure.snap");
         assertEq(value, "53894");
     }
 
     function testInternalClosure() public {
         snap("internalClosure", add);
 
-        string memory value = vm.readLine(".forge-snapshots/internalClosure.snap");
+        string memory value = readFirstLine(".forge-snapshots/internalClosure.snap");
         assertEq(value, "19177");
     }
 
@@ -63,9 +72,9 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.add();
         snapEnd();
 
-        string memory first = vm.readLine(".forge-snapshots/addFirst.snap");
-        string memory second = vm.readLine(".forge-snapshots/addSecond.snap");
-        string memory third = vm.readLine(".forge-snapshots/addThird.snap");
+        string memory first = readFirstLine(".forge-snapshots/addFirst.snap");
+        string memory second = readFirstLine(".forge-snapshots/addSecond.snap");
+        string memory third = readFirstLine(".forge-snapshots/addThird.snap");
 
         assertEq(second, third);
         assertEq(first, "5247");
@@ -77,7 +86,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.manyAdd();
         snapEnd();
 
-        string memory value = vm.readLine(".forge-snapshots/manyAdd.snap");
+        string memory value = readFirstLine(".forge-snapshots/manyAdd.snap");
         assertEq(value, "24330");
     }
 
@@ -86,14 +95,14 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.manySstore();
         snapEnd();
 
-        string memory value = vm.readLine(".forge-snapshots/manySstore.snap");
+        string memory value = readFirstLine(".forge-snapshots/manySstore.snap");
         assertEq(value, "56084");
     }
 
     function testSnapshotCodeSize() public {
         SimpleOperations sizeTarget = new SimpleOperations();
         snapSize("sizeTarget", address(sizeTarget));
-        string memory size = vm.readLine(".forge-snapshots/sizeTarget.snap");
+        string memory size = readFirstLine(".forge-snapshots/sizeTarget.snap");
         assertEq(size, "303");
     }
 
@@ -123,7 +132,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         // preloaded with the wrong value
         snapStart("checkManySstore");
         simpleOperations.manySstore();
-        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 59561));
+        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 59528));
         snapEnd();
     }
 

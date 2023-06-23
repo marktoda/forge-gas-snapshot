@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import "forge-std/console2.sol";
 import {Script} from "forge-std/Script.sol";
-import {UintString} from "./utils/UintString.sol";
+import {TextHandler} from "./utils/TextHandler.sol";
 
 contract GasSnapshot is Script {
     error GasMismatch(uint256 oldGas, uint256 newGas);
@@ -12,8 +12,6 @@ contract GasSnapshot is Script {
     string public constant CHECK_ENV_VAR = "FORGE_SNAPSHOT_CHECK";
     /// @notice save gas snapshots in this dir
     string public constant SNAP_DIR = ".forge-snapshots/";
-    /// @notice temporary env variable to help with string parsing
-    string private constant TEMP_ENV_VAR = "_forge_snapshot_temp_gas";
     /// @notice gas overhead for the snapshotting function itself
     uint256 private constant GAS_CALIBRATION = 100;
 
@@ -115,8 +113,8 @@ contract GasSnapshot is Script {
 
     /// @notice Read the last snapshot value from the file
     function _readSnapshot(string memory name) private view returns (uint256 res) {
-        string memory oldValue = vm.readLine(_getSnapFile(name));
-        res = UintString.stringToUint(oldValue);
+        string memory oldValue = TextHandler.extractFirstLine(vm.readFile(_getSnapFile(name)));
+        res = vm.parseUint(oldValue);
     }
 
     /// @notice Write the new snapshot value to file
@@ -130,7 +128,10 @@ contract GasSnapshot is Script {
         mkdirp[0] = "mkdir";
         mkdirp[1] = "-p";
         mkdirp[2] = dir;
-        vm.ffi(mkdirp);
+        try vm.ffi(mkdirp) {}
+        catch {
+            // Ignore error, this just helps the code run on windows if the directory already exists
+        }
     }
 
     /// @notice Get the snapshot file name
