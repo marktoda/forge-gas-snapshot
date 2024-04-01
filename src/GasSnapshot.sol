@@ -121,7 +121,7 @@ contract GasSnapshot is Script {
         return string(abi.encodePacked(SNAP_DIR, name, ".snap"));
     }
 
-    /// @notice Check if the snapshot file exists
+    /// @notice Return if the snapshot file exists
     function _snapshotFileExists(string memory name) private returns (bool) {
         string[] memory command = new string[](2);
         command[0] = "cat";
@@ -132,7 +132,7 @@ contract GasSnapshot is Script {
         return bytes32(result) != bytes32(0);
     }
 
-    /// @notice check if should compare the snapshot value or write it
+    /// @notice Execute the check or write the snapshot based on the requirements
     function _checkOrWriteSnapshot(string memory name, uint256 gasUsed) private {
         if (check && _snapshotFileExists(name)) return _checkSnapshot(name, gasUsed);
         _writeSnapshot(name, gasUsed);
