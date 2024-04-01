@@ -38,20 +38,13 @@ contract GasSnapshot is Script {
     /// @dev The next call to `snapEnd` will end the snapshot
     function snapSize(string memory name, address target) internal {
         uint256 size = target.code.length;
-        if (check) {
-            _checkSnapshot(name, size);
-        } else {
-            _writeSnapshot(name, size);
-        }
+
+        _checkOrWriteSnapshot(name, size);
     }
 
     /// @notice Snapshot the given value
     function snap(string memory name, uint256 value) internal {
-        if (check) {
-            _checkSnapshot(name, value);
-        } else {
-            _writeSnapshot(name, value);
-        }
+        _checkOrWriteSnapshot(name, value);
     }
 
     /// @notice Snapshot the given external closure
@@ -60,11 +53,8 @@ contract GasSnapshot is Script {
         uint256 gasBefore = gasleft();
         fn();
         uint256 gasUsed = gasBefore - gasleft();
-        if (check) {
-            _checkSnapshot(name, gasUsed);
-        } else {
-            _writeSnapshot(name, gasUsed);
-        }
+
+        _checkOrWriteSnapshot(name, gasUsed);
     }
 
     /// @notice Snapshot the given internal closure
@@ -73,11 +63,8 @@ contract GasSnapshot is Script {
         uint256 gasBefore = gasleft();
         fn();
         uint256 gasUsed = gasBefore - gasleft();
-        if (check) {
-            _checkSnapshot(name, gasUsed);
-        } else {
-            _writeSnapshot(name, gasUsed);
-        }
+
+        _checkOrWriteSnapshot(name, gasUsed);
     }
 
     /// @notice Start a snapshot with the given name
@@ -98,11 +85,7 @@ contract GasSnapshot is Script {
         // reset to 0 so all writes for consistent overhead handling
         cachedGas = 0;
 
-        if (check) {
-            _checkSnapshot(cachedName, gasUsed);
-        } else {
-            _writeSnapshot(cachedName, gasUsed);
-        }
+        _checkOrWriteSnapshot(cachedName, gasUsed);
     }
 
     /// @notice Check the gas usage against the snapshot. Revert on mismatch
@@ -136,6 +119,23 @@ contract GasSnapshot is Script {
     /// @notice Get the snapshot file name
     function _getSnapFile(string memory name) private pure returns (string memory) {
         return string(abi.encodePacked(SNAP_DIR, name, ".snap"));
+    }
+
+    /// @notice Check if the snapshot file exists
+    function _snapshotFileExists(string memory name) private returns (bool) {
+        string[] memory command = new string[](2);
+        command[0] = "cat";
+        command[1] = _getSnapFile(name);
+
+        bytes memory result = vm.ffi(command);
+
+        return bytes32(result) != bytes32(0);
+    }
+
+    /// @notice check if should compare the snapshot value or write it
+    function _checkOrWriteSnapshot(string memory name, uint256 gasUsed) private {
+        if (check && _snapshotFileExists(name)) return _checkSnapshot(name, gasUsed);
+        _writeSnapshot(name, gasUsed);
     }
 
     /// @notice sets the library to check mode
