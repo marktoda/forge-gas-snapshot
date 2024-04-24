@@ -29,6 +29,15 @@ contract GasSnapshotTest is Test, GasSnapshot {
         assertEq(value, "5247");
     }
 
+    function testAddLastCall() public {
+        simpleOperations.singleSstore();
+        snapLastCall("singleSstoreLastCall");
+
+        string memory value = vm.readLine(".forge-snapshots/singleSstoreLastCall.snap");
+        // includes 21,000 overhead for transaction, 20,000 clean SSTORE
+        assertEq(value, "43429");
+    }
+
     function testAddClosure() public {
         snap("addClosure", simpleOperations.add);
 

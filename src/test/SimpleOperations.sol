@@ -16,6 +16,10 @@ contract SimpleOperations {
         }
     }
 
+    function singleSstore() public {
+        test = block.timestamp + 3;
+    }
+
     function manySstore() public {
         for (uint256 i = 0; i < 100; i++) {
             test = i + 2;
