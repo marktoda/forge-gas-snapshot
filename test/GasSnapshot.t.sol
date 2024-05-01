@@ -33,7 +33,9 @@ contract GasSnapshotTest is Test, GasSnapshot {
         simpleOperations.singleSstore();
         snapLastCall("singleSstoreLastCall");
 
-        string memory value = vm.readLine(".forge-snapshots/singleSstoreLastCall.snap");
+        string memory value = vm.readLine(
+            ".forge-snapshots/singleSstoreLastCall.snap"
+        );
         // includes 21,000 overhead for transaction, 20,000 clean SSTORE
         assertEq(value, "43429");
     }
@@ -41,21 +43,27 @@ contract GasSnapshotTest is Test, GasSnapshot {
     function testSingleSstoreClosure() public {
         snap("singleSstoreClosure", simpleOperations.singleSstore);
 
-        string memory value = vm.readLine(".forge-snapshots/singleSstoreClosure.snap");
+        string memory value = vm.readLine(
+            ".forge-snapshots/singleSstoreClosure.snap"
+        );
         assertEq(value, "46269");
     }
 
     function testManySstoreClosure() public {
         snap("sstoreClosure", simpleOperations.manySstore);
 
-        string memory value = vm.readLine(".forge-snapshots/sstoreClosure.snap");
+        string memory value = vm.readLine(
+            ".forge-snapshots/sstoreClosure.snap"
+        );
         assertEq(value, "68158");
     }
 
     function testInternalClosure() public {
         snap("internalClosure", singleSstore);
 
-        string memory value = vm.readLine(".forge-snapshots/internalClosure.snap");
+        string memory value = vm.readLine(
+            ".forge-snapshots/internalClosure.snap"
+        );
         assertEq(value, "22217");
     }
 
@@ -115,7 +123,9 @@ contract GasSnapshotTest is Test, GasSnapshot {
     function testSnapshotCheckSizeFail() public {
         setCheckMode(true);
         SimpleOperations sizeTarget = new SimpleOperations();
-        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 349));
+        vm.expectRevert(
+            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 349)
+        );
         snapSize("checkSizeFail", address(sizeTarget));
     }
 
@@ -132,8 +142,38 @@ contract GasSnapshotTest is Test, GasSnapshot {
         // preloaded with the wrong value
         snapStart("checkManySstore");
         simpleOperations.manySstore();
-        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 73825));
+        vm.expectRevert(
+            abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 73825)
+        );
         snapEnd();
+    }
+
+    function testCheckCreateFileIfMissing() public {
+        setCheckMode(true);
+
+        string memory fileName = "checkCreateFileIfMissing";
+
+        assertFalse(
+            snapshotFileExists(fileName),
+            "The file should not exist yet"
+        );
+
+        snapStart(fileName);
+        simpleOperations.add();
+        snapEnd();
+
+        assertTrue(snapshotFileExists(fileName));
+        vm.removeFile(string.concat(".forge-snapshots/", fileName, ".snap"));
+    }
+
+    function snapshotFileExists(string memory name) private returns (bool) {
+        string[] memory command = new string[](2);
+        command[0] = "cat";
+        command[1] = string.concat(".forge-snapshots/", name, ".snap");
+
+        bytes memory result = vm.ffi(command);
+
+        return bytes32(result) != bytes32(0);
     }
 
     uint256 internal test;
