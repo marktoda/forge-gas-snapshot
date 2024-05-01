@@ -48,7 +48,6 @@ contract GasSnapshot is Script {
     }
 
     /// @notice Snapshot the given external closure
-    /// @dev most accurate as storage cost semantics are not involved
     function snap(string memory name, function() external fn) internal {
         uint256 gasBefore = gasleft();
         fn();
@@ -58,13 +57,23 @@ contract GasSnapshot is Script {
     }
 
     /// @notice Snapshot the given internal closure
-    /// @dev most accurate as storage cost semantics are not involved
     function snap(string memory name, function() internal fn) internal {
         uint256 gasBefore = gasleft();
         fn();
         uint256 gasUsed = gasBefore - gasleft();
 
         _checkOrWriteSnapshot(name, gasUsed);
+    }
+
+    /// @notice Snapshot using forge isolate of gas of the previous call
+    /// @dev most accurate as this uses a complete transaction and no storage semantics
+    function snapLastCall(string memory name) internal {
+        uint256 gasUsed = vm.lastCallGas().gasTotalUsed;
+        if (check) {
+            _checkSnapshot(name, gasUsed);
+        } else {
+            _writeSnapshot(name, gasUsed);
+        }
     }
 
     /// @notice Start a snapshot with the given name
