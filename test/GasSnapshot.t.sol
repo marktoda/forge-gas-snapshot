@@ -176,34 +176,6 @@ contract GasSnapshotTest is Test, GasSnapshot {
         return bytes32(result) != bytes32(0);
     }
 
-    function testCheckCreateFileIfMissing() public {
-        setCheckMode(true);
-
-        string memory fileName = "checkCreateFileIfMissing";
-
-        assertFalse(
-            snapshotFileExists(fileName),
-            "The file should not exist yet"
-        );
-
-        snapStart(fileName);
-        simpleOperations.add();
-        snapEnd();
-
-        assertTrue(snapshotFileExists(fileName));
-        vm.removeFile(string.concat(".forge-snapshots/", fileName, ".snap"));
-    }
-
-    function snapshotFileExists(string memory name) private returns (bool) {
-        string[] memory command = new string[](2);
-        command[0] = "cat";
-        command[1] = string.concat(".forge-snapshots/", name, ".snap");
-
-        bytes memory result = vm.ffi(command);
-
-        return bytes32(result) != bytes32(0);
-    }
-
     uint256 internal test;
 
     function singleSstore() public {
