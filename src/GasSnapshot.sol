@@ -12,8 +12,6 @@ contract GasSnapshot is Script {
     string public constant CHECK_ENV_VAR = "FORGE_SNAPSHOT_CHECK";
     /// @notice save gas snapshots in this dir
     string public constant SNAP_DIR = ".forge-snapshots/";
-    /// @notice temporary env variable to help with string parsing
-    string private constant TEMP_ENV_VAR = "_forge_snapshot_temp_gas";
     /// @notice gas overhead for the snapshotting function itself
     uint256 private constant GAS_CALIBRATION = 100;
 
