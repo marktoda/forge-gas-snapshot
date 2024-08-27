@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "forge-std/console2.sol";
-import {Test} from "forge-std/Test.sol";
+import "forge-std/src/console2.sol";
+import {Test} from "forge-std/src/Test.sol";
 import {GasSnapshot} from "../src/GasSnapshot.sol";
 import {SimpleOperations} from "../src/test/SimpleOperations.sol";
 
@@ -26,7 +26,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/singleSstore.snap");
-        assertEq(value, "48459");
+        assertEq(value, "27395");
     }
 
     function testSingleSstoreLastCall() public {
@@ -35,21 +35,21 @@ contract GasSnapshotTest is Test, GasSnapshot {
 
         string memory value = vm.readLine(".forge-snapshots/singleSstoreLastCall.snap");
         // includes 21,000 overhead for transaction, 20,000 clean SSTORE
-        assertEq(value, "43429");
+        assertEq(value, "22365");
     }
 
     function testSingleSstoreClosure() public {
         snap("singleSstoreClosure", simpleOperations.singleSstore);
 
         string memory value = vm.readLine(".forge-snapshots/singleSstoreClosure.snap");
-        assertEq(value, "46269");
+        assertEq(value, "25205");
     }
 
     function testManySstoreClosure() public {
         snap("sstoreClosure", simpleOperations.manySstore);
 
         string memory value = vm.readLine(".forge-snapshots/sstoreClosure.snap");
-        assertEq(value, "68158");
+        assertEq(value, "47094");
     }
 
     function testInternalClosure() public {
@@ -96,7 +96,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/manySstore.snap");
-        assertEq(value, "70348");
+        assertEq(value, "49284");
     }
 
     function testSnapshotCodeSize() public {
@@ -132,7 +132,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         // preloaded with the wrong value
         snapStart("checkManySstore");
         simpleOperations.manySstore();
-        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 73825));
+        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 52761));
         snapEnd();
     }
 

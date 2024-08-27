@@ -4,3 +4,16 @@ out = 'out'
 libs = ['lib']
 ffi = true
 fs_permissions = [{ access = "read-write", path = ".forge-snapshots/"}]
+
+[soldeer]
+# whether soldeer manages remappings
+remappings_generated = true
+
+# whether soldeer re-generates all remappings when installing, updating or uninstalling deps
+remappings_regenerate = true
+
+# whether to suffix the remapping with the version: `name-a.b.c`
+remappings_version = false
+
+[dependencies]
+forge-std = "1.9.2"
