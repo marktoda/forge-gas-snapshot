@@ -22,6 +22,14 @@ jobs:
         with:
           version: nightly
 
+      - name: Install Dependencies
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+        run: |
+          forge soldeer install
+        id: install
+
       - name: Run Forge build
         run: |
           forge --version
