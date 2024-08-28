@@ -26,7 +26,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/singleSstore.snap");
-        assertEq(value, "27395");
+        assertEq(value, "48459");
     }
 
     function testSingleSstoreLastCall() public {
@@ -35,21 +35,21 @@ contract GasSnapshotTest is Test, GasSnapshot {
 
         string memory value = vm.readLine(".forge-snapshots/singleSstoreLastCall.snap");
         // includes 21,000 overhead for transaction, 20,000 clean SSTORE
-        assertEq(value, "22365");
+        assertEq(value, "43429");
     }
 
     function testSingleSstoreClosure() public {
         snap("singleSstoreClosure", simpleOperations.singleSstore);
 
         string memory value = vm.readLine(".forge-snapshots/singleSstoreClosure.snap");
-        assertEq(value, "25205");
+        assertEq(value, "46269");
     }
 
     function testManySstoreClosure() public {
         snap("sstoreClosure", simpleOperations.manySstore);
 
         string memory value = vm.readLine(".forge-snapshots/sstoreClosure.snap");
-        assertEq(value, "47094");
+        assertEq(value, "68158");
     }
 
     function testInternalClosure() public {
@@ -96,7 +96,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         snapEnd();
 
         string memory value = vm.readLine(".forge-snapshots/manySstore.snap");
-        assertEq(value, "49284");
+        assertEq(value, "70348");
     }
 
     function testSnapshotCodeSize() public {
@@ -132,7 +132,7 @@ contract GasSnapshotTest is Test, GasSnapshot {
         // preloaded with the wrong value
         snapStart("checkManySstore");
         simpleOperations.manySstore();
-        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 52761));
+        vm.expectRevert(abi.encodeWithSelector(GasSnapshot.GasMismatch.selector, 1, 73825));
         snapEnd();
     }
 
