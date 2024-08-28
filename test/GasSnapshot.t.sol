@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "forge-std/console2.sol";
-import {Test} from "forge-std/Test.sol";
+import "forge-std/src/console2.sol";
+import {Test} from "forge-std/src/Test.sol";
 import {GasSnapshot} from "../src/GasSnapshot.sol";
 import {SimpleOperations} from "../src/test/SimpleOperations.sol";
 

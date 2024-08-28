@@ -10,7 +10,7 @@ Forge has native gas reporting with `forge snapshot` and `forge test --gas-repor
 
 # Installation
 ```solidity
-forge install marktoda/forge-gas-snapshot
+forge soldeer install forge-gas-snapshot~v0.0.4
 ```
 
 - NOTE: foundry.toml must be updated to allow forge to write the snapshots
