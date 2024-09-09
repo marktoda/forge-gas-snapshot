@@ -9,8 +9,16 @@ Forge has native gas reporting with `forge snapshot` and `forge test --gas-repor
 - See gas changes over time through commit history
 
 # Installation
+
+## Soldeer
+Package hosted at [soldeer/forge-gas-snapshot](https://soldeer.xyz/project/forge-gas-snapshot)
 ```solidity
-forge soldeer install forge-gas-snapshot~v0.0.4
+forge soldeer install forge-gas-snapshot~0.0.4
+```
+
+## Foundry
+```solidity
+forge install marktoda/forge-gas-snapshot
 ```
 
 - NOTE: foundry.toml must be updated to allow forge to write the snapshots
