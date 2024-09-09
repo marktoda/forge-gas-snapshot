@@ -3,3 +3,5 @@
 .forge_snapshots/
 out/
 dependencies/
+.gitignore
+cache/
