@@ -1,6 +1,8 @@
 # Forge Gas Snapshot
 
-Flexible, checked-in gas snapshotting for [Foundry](https://github.com/foundry-rs).
+**[DEPRECATED] - [Upstreamed](https://github.com/foundry-rs/foundry/pull/8952) into Foundry**
+
+Flexible, checked-in gas snapshotting for [Foundry](https://github.com/foundry-rs)
 
 Forge has native gas reporting with `forge snapshot` and `forge test --gas-report`, but neither perfectly fit my needs. Specifically, `forge-gas-snapshot` aims to allow for:
 - Gas reports over specific, known flows
